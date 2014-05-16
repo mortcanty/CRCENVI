@@ -1,0 +1,19 @@
+
+Help on CalcHeight:
+===================
+
+After loading an RPC file, click on the bottom of
+a vertical structure to set the base height and then
+shift-click on the top of the structure. Press
+the CALC button to display the structure's height,
+latitude, longitude and base elevation. The number
+in brackets next to the height is the minimum distance 
+(in pixels) between the top pixel and a vertical line 
+through the bottom pixel. It should be of the order of 1 
+or less.
+
+If no DEM is loaded, the base elevation is the average
+value for the whole scene. 
+
+If a DEM is used, the base elevation is taken from it.
+The latitude and longitude are then orthorectified values.
