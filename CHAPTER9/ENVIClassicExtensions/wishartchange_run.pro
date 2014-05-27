@@ -62,6 +62,7 @@ pro wishartchange_run, event
      return
    end
    envi_file_query, fid1, fname=fname1, bnames=bnames1
+   print, 'First image: '+fname1 
    cols1 = dims1[2]-dims1[1]+1
    rows1 = dims1[4]-dims1[3]+1
    bands1 = n_elements(pos1)
@@ -72,7 +73,8 @@ pro wishartchange_run, event
    we = widget_param(base, dt=4, field=5, floor=1, $
      default=8, uvalue='param', xsize=32, /auto)
    result = auto_wid_mng(base)
-   if (result.accept eq 0) then n1=double(8) else n1=double(result.param)
+   if (result.accept eq 0) then n1=float(8) else n1=float(result.param)
+   print, 'Number of looks: '+strtrim(n1,2)
    envi_select, title='Choose second covariance matrix image', $
      fid=fid2, dims=dims2, pos=pos2, /no_spec, /no_dims
    if (fid2 eq -1) then begin
@@ -80,20 +82,22 @@ pro wishartchange_run, event
      return
    end
    envi_file_query, fid2, fname=fname2, bnames=bnames2
+   print, 'First image: '+fname2 
    cols2 = dims2[2]-dims2[1]+1
    rows2 = dims2[4]-dims2[3]+1
    bands2 = n_elements(pos2)
    base = widget_auto_base(title='Number of looks, second image')
    we = widget_param(base, dt=4, field=5, floor=1, $
-     default=8, uvalue='param', xsize=32, /auto)
+     default=n1, uvalue='param', xsize=32, /auto)
    result = auto_wid_mng(base)
-   if (result.accept eq 0) then n2=double(8) else n2=double(result.param) 
-   
+   if (result.accept eq 0) then n2=float(8) else n2=float(result.param) 
+   print, 'Number of looks: '+strtrim(n2,2)
    base = widget_auto_base(title='Significance level')
    we = widget_param(base, dt=4, field=5, floor=0., $
    default=0.01, uvalue='param', /auto)
    result = auto_wid_mng(base)
-   if (result.accept eq 0) then siglevel=0.01 else siglevel = float(result.param)   
+   if (result.accept eq 0) then siglevel=0.01 else siglevel = float(result.param) 
+   print, 'Change significance level:' + strtrim(siglevel,2)  
      
    base = widget_auto_base(title='Output image')
    sb = widget_base(base, /row, /frame)
@@ -132,93 +136,6 @@ pro wishartchange_run, event
    envi_convert_file_coordinates, fid1, x1, y1, e, n, /to_map
    envi_convert_file_coordinates, fid2, x2, y2, e, n
    pts[*,3] = [x1,y1,x2,y2]
-
-; image-image regiister?   
-   answer=dialog_message('Co-register first?',/question,/default_no)
-   if answer eq 'No' then goto, cont
-   
-; yes, replace with image-image co-registration tie points
-   ENVI_DOIT, 'ENVI_AUTO_TIE_POINTS_DOIT', base_fid=fid1, warp_fid=fid2, out_tie_points_array=pts1
-; plausibility check   
-   n_gcps = (size(pts1))[2]
-   idx = transpose(findgen(n_gcps))
-   base_gcps = [pts1[0:1,*],idx]
-   warp_gcps = [pts1[2:3,*],idx]   
-   ratios = fltarr(n_gcps*(n_gcps-1)/2,3)
-   k=0L
-   for i=0,n_gcps-1 do for j=i+1,n_gcps-1 do begin
-     den = norm(warp_gcps[*,i]-warp_gcps[*,j])
-     if den gt 0 then ratios[k,*] = [norm(base_gcps[*,i]-base_gcps[*,j])/den,i,j] $
-     else ratios[k,*]=[10,i,j]
-     k=k+1
-   endfor
-   ratios[*,0]=alog(ratios[*,0])   
-   hist = histogram(ratios[*,0],nbins=50,min=-1.0,max=1.0,reverse_indices=R)
-   plt=plot(hist,dimensions=[400,400],location=[50,100])
-   plt.title='Distance Ratios Histogram'
-; just take the ratios in the histogram maximum bin
-   i = (where(hist eq max(hist)))[0]
-   max_indices = R[R[i] : R[i+1]-1]
-   ratios = ratios[max_indices,*]
-; iterate on sdev
-   sigma = 1.0
-   k=0L
-   n_ratios=n_elements(ratios[*,0])
-   while (sigma gt 0.002) and (k lt 5000) do begin
-     mn = mean(ratios[*,0])
-     indices = where(abs(ratios[*,0]-mn) lt 3*sigma,count)
-     if count gt 0 then ratios=ratios[indices,*]
-     if n_elements(ratios[*,0]) lt n_ratios then begin
-       sigma = stddev(ratios[*,0])
-       n_ratios = n_elements(ratios[*,0])
-     end else sigma = 2*sigma/3
-     k=k+1
-   endwhile
-   if sigma le 0.01 then begin
-     indices = where(abs(ratios[*,0]-mn) lt sigma,count)
-     if count gt 0 then ratios=ratios[where(abs(ratios[*,0]-mn) lt sigma),*]
-     gcp_table = fltarr(4,n_gcps)
-     k=0
-;   Extract the GCPs from the array of ratios
-     for i=0,n_gcps-1 do begin
-       indices = where(round(ratios[*,1]) eq i,count1)
-       indices = where(round(ratios[*,2]) eq i,count2)
-       if (count1 ne 0) and (count2 ne 0) then begin
-         gcp_table[0:1,k]=base_gcps[*,i] + [dims1[1],dims1[3]]
-         gcp_table[2:3,k]=warp_gcps[*,i] + [dims2[1],dims2[3]]
-         k=k+1
-       endif
-     endfor
-;   Save gcps to 'pts' file
-     if k gt 0 then begin
-       print, 'GCPs found: ',strtrim(k,2)
-       answer = dialog_message(strtrim(k,2)+' GCPs found. Continue?',/question)
-       if answer eq 'No' then begin
-          void=dialog_message('Cancelled, aborting.',/information)
-          return
-       endif   
-       gcpfile = file_dirname(fname1,/mark_directory)+'gcps.pts'
-       openw,lun,gcpfile,/get_lun
-       printf,lun,';CGPS from AUTO_TIE_POINTS_DOIT'
-       printf,lun,';'+systime(0)
-       printf,lun,';base file '+fname1
-       printf,lun,';Warp file '+fname2
-       printf,lun,gcp_table[*,0:k-1]
-       free_lun,lun
-       print, 'GCPs written to '+gcpfile
-     end else begin
-       print,'No GCPs found'
-       void=dialog_message('No GCPs found, aborting.',/information)
-       return
-     endelse
-   end else begin
-     print,'No GCPs found'
-     void=dialog_message('No GCPs found, aborting.',/information)
-     return
-   endelse   
-   pts = gcp_table[*,0:k-1]
-   
- cont:   
    
  ; co-register  
  ;-----workaround------------------
@@ -256,7 +173,6 @@ pro wishartchange_run, event
        zeta1 = n1*envi_get_data(fid=fid1,dims=dims1,pos=8);c33
        det1 = k1*xsi1*zeta1 + 2*real_part(a1*b1*conj(rho1)) - xsi1*(abs(rho1)^2) - k1*(abs(b1)^2) - zeta1*(abs(a1)^2)
        span1 = k1 + 2*xsi1 + zeta1
-       print, bnames2
        k2 = n2*envi_get_data(fid=fid2,dims=dims2,pos=0)  ;c11
        a2 = envi_get_data(fid=fid2,dims=dims2,pos=1)  ;c12
        im = envi_get_data(fid=fid2,dims=dims2,pos=2)
@@ -291,7 +207,6 @@ pro wishartchange_run, event
        xsi1 = n1*envi_get_data(fid=fid1,dims=dims1,pos=3);c22
        det1 = k1*xsi1 - abs(a1)^2
        span1 = k1 + xsi1
-       print, 'c11-> '+bnames2[0]+' c12re-> '+bnames2[1]+' c12im-> '+bnames2[2]+' c22-> '+bnames2[3]  
        k2 = n2*envi_get_data(fid=fid2,dims=dims2,pos=0) ;c11
        a2 = envi_get_data(fid=fid2,dims=dims2,pos=1) ;c12
        im = envi_get_data(fid=fid2,dims=dims2,pos=2)
@@ -312,7 +227,6 @@ pro wishartchange_run, event
        k1 = n1*envi_get_data(fid=fid1,dims=dims1,pos=0) ;c11
        span1 = k1
        det1 = k1
-       print, 'c11-> '+bnames2[0]
        k2 = n2*envi_get_data(fid=fid2,dims=dims2,pos=0) ;c11
        det2 = k2
        k3 = k1 + k2
