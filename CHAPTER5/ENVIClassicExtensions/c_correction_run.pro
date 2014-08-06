@@ -153,8 +153,8 @@ image=fltarr(num_pixels, num_bands)
 widget_control, /hourglass
 for k=0, num_bands-1 do begin
    band = envi_get_data(fid=fid_image, dims=dims_image, pos=pos_image[k])
-   m=( regress(cos_gamma_i[mask], band[mask], const=b, correlation=r) )[0]
-   print,'band '+strtrim(k+1,2)+': m = '+strtrim(m,2)+'  b = '+strtrim(b,2)+'  r = '+strtrim(r[0],2)
+   m=( regress(cos_gamma_i[mask], band[mask], const=b, correlation=r, /double) )[0]
+   print,'band '+strtrim(k+1,2)+': m = '+strtrim(m,2)+'  b = '+strtrim(b,2)+'  r = '+strtrim(r[0],2)  
    image[mask,k] = band[mask]*(cos(theta_z) + b/m)/(cos_gamma_i[mask] + b/m)
    if ncomplement gt 0 then image[nomask,k] = band[nomask]
 endfor

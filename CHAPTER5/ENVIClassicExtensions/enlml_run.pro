@@ -268,6 +268,6 @@ pro enlml_run, event
    p = plot(findgen(200)/10.0,hist[0:*])
    ax = p.AXES
    ax[0].TITLE = 'ENL'
-   envi_enter_data, ENL_ML, bnames = ['ENL_ML'], map_info = map_info  
+   envi_enter_data, ENL_ML, bnames = ['ENL_ML'] 
    print, 'result written to memory, elapsed time: '+strtrim(systime(2)-start,2)+' sec'    
 end
