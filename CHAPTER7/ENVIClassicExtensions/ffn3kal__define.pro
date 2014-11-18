@@ -140,8 +140,7 @@ Pro FFN3KAL::train, verbose=verbose, cancel=cancel
    dWo =  dblarr(self.KK, self.LL2+1)
    work = dblarr(self.LL2)
    iter = (iter100 = 0L)
-   progressbar = Obj_New('progressbar', $
-     Color='blue', Text='0',$
+   progressbar = Obj_New('cgprogressbar', /cancel, $
      title='Training: example number...', $
      xsize=250,ysize=20)
    progressbar->start
@@ -222,8 +221,7 @@ Pro FFN3KAL::train, verbose=verbose, cancel=cancel
          if verbose  then (*self.cost_array)[iter100]= $
              self->cost() ; full training cost
          iter100 = iter100+1
-         progressbar->Update,iter*100/self.iterations,$
-               text=strtrim(iter,2)
+         progressbar->Update,iter*100/self.iterations
          if verbose then plot,*self.cost_array,xrange=[0,iter100], $
             color=0,background='FFFFFF'XL,$
             xtitle='Iterations/100)', $

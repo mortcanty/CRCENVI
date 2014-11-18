@@ -126,15 +126,15 @@ etamax = 1.0
 etamin = 0.001
 sigmamax = K/2.0
 sigmamin = 0.5
-progressbar = Obj_New('progressbar', Color='blue', Text='0',$
-              title= 'SOM training...',xsize=250,ysize=20)
+progressbar = Obj_New('cgprogressbar',$
+              title='SOM training...',xsize=250,ysize=20, /cancel)
 progressbar->start
 for i=0L,9999 do begin
    if progressbar->CheckCancel() then begin
       print,'training aborted'
       goto, done
    endif
-   progressbar->Update,(i*100)/10000,text=strtrim(i,2)
+   progressbar->Update,(i*100)/10000
    g = samples[i,*]
    kstar = winner(g, W)
    eta = etamax*(etamin/etamax)^(i/10000.0)
@@ -163,7 +163,7 @@ end
 xplot3d, W[*,0],W[*,1],W[*,2],linestyle=6,symbol=symbols
 
 ; cluster the image
-progressbar = Obj_New('progressbar', Color='blue', Text='0',$
+progressbar = Obj_New('cgprogressbar', $
               title= 'SOM classifying...',xsize=250,ysize=20)
 progressbar->start
 class_image = bytarr(num_pixels,3)
@@ -174,7 +174,7 @@ for i=0L,num_pixels-1 do begin
          goto, done1
       endif
       incr = (i*100)/num_pixels
-      progressbar->Update,incr,text=strtrim(incr,2)+'%'
+      progressbar->Update,incr
    endif
    x = image[i,*]
    kstar = winner(x,W)

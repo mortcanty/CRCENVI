@@ -153,8 +153,6 @@ pro wishartchange_run, event
                                     xsize = xsize, ysize = ysize, $
                                     out_name = fname2+'_reg'                                   
    fid2 = r_fid  
-   
-    
    dims2 = [-1,0,cols1-1,0,rows1-1]                                   
 ; calculate determinants and change statistic distribution parameters  
    case bands1 of

@@ -33,9 +33,6 @@
 ; :Author:      
 ;       Mort Canty (2009)           
 ;-
-
-
-
 Function FFNCG::Init, Gs, Ls, L, epochs=epochs
 COMPILE_OPT STRICTARR
    catch, theError

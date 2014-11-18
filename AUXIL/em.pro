@@ -34,9 +34,6 @@
 ;           take part in the iteration (default all)
 ;        wnd: in, optional
 ;           window for displaying the log likelihood
-;        mask: in, optional
-;           defines the region to be included in
-;           clustering
 ;        maxinter: in, optional
 ;           maximum iterations
 ;        mininter: in, optional
