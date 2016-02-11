@@ -115,7 +115,7 @@ COMPILE_OPT STRICTARR
     end
     4: begin
       c_bands = 3
-      GGs = complexarr(3,cols*rows)
+      GGs = complexarr(3,m)
       GGs[0,*] = complex(GG1s[0,*],0.0*GG1s[0,*])
       GGs[1,*] = complex(GG1s[1,*],GG1s[2,*])
       GGs[2,*] = complex(GG1s[3,*],0.0*GG1s[3,*])
