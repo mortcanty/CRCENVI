@@ -26,7 +26,7 @@ function gpu_detect, devId, _ref_extra=e
   gpuinit, /quiet
   
 ; GPULib present, but need IDL 8 syntax 
-  if (~gpu_idlversion(require='8.0')) then return, 0
+;  if (~gpu_idlversion(require='8.0')) then return, 0
  
   return, 1
 end

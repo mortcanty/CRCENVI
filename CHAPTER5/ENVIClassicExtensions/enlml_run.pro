@@ -14,7 +14,7 @@ PRO enlml_run_define_buttons, buttonInfo
    ENVI_DEFINE_MENU_BUTTON, buttonInfo, $
       VALUE = 'ENL estimation', $
       REF_VALUE = 'AIRSAR Scattering Classification', $
-      EVENT_PRO = 'enl_ml_run', $
+      EVENT_PRO = 'enlml_run', $
       UVALUE = 'ENLML',$
       POSITION = 'after'
 END

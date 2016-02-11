@@ -54,11 +54,11 @@ print, '---------------------------------'
 
 ;seed = 123L
 
-catch, theError
-if theError ne 0 then begin
-   void = Dialog_Message(!Error_State.Msg, /error)
-   return
-endif
+;catch, theError
+;if theError ne 0 then begin
+;   void = Dialog_Message(!Error_State.Msg, /error)
+;   return
+;endif
 
 envi_select, title='Choose multispectral image', $
              fid=fid, dims=dims,pos=pos

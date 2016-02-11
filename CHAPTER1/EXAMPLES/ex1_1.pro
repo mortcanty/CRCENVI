@@ -15,7 +15,7 @@ pro EX1_1
    bands = n_elements(pos)
 
 ; BSQ array
-   mage = fltarr(cols,rows,bands)
+   image = fltarr(cols,rows,bands)
 
    for i=0,bands-1 do image[*,*,i] = $
      envi_get_data(fid=fid,dims=dims,pos=pos[i])
