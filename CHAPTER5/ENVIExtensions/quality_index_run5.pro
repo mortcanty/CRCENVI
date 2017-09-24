@@ -43,7 +43,7 @@ catch, err
    endif
    
 e5 = envi(/current)
-   if e eq !null then $
+   if e5 eq !null then $
       message, 'This extension requires an interactive ENVI session 
  
 
