@@ -156,8 +156,17 @@ Function mad_iter, fid1, fid2, dims1, dims2, pos1, pos2, m_fid, niter=niter, rho
          end else weights = ones   
 ;       only sample pixels under the mask
          indices = where(mask[*,tile_index],count)
-         if count gt 0 then $
-            cpm->update,[tile1[*,indices],tile2[*,indices]],weights=weights[indices]
+         if count gt 0 then begin
+            Xs = [tile1[*,indices],tile2[*,indices]]
+            if count EQ 1 then begin
+                XSize = SIZE( Xs )
+                Xs = REFORM( Xs, XSize[1], 1 )
+                XSize = 0
+            endif
+            cpm->update,Xs,weights=weights[indices]
+;            cpm->update,[tile1[*,indices],tile2[*,indices]],weights=weights[indices]
+           Xs = 0
+         endif
       endfor
       progressbar->destroy
 
