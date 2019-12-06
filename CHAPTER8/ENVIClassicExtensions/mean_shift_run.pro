@@ -114,8 +114,12 @@ COMPILE_OPT IDL2
    modes = fltarr(nb+2)
    labeled = intarr(m)
 
-   progressbar = Obj_New('progressbar', Color='blue', Text=' ',$
-                 title='Mean shift filter...',xsize=300,ysize=20)
+   progressbar = Obj_New('cgprogressbar',$
+                       title='Mean shift filter...',xsize=250,ysize=20)
+
+;   progressbar = Obj_New('progressbar', Color='blue', Text=' ',$
+;                 title='Mean shift filter...',xsize=300,ysize=20)
+
    progressbar->start
 
    idx = 0L

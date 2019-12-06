@@ -43,8 +43,12 @@ Ds = fltarr(n,NN)
 W = fltarr(n,NN)
 
 ; iteration
-progressbar = Obj_New('progressbar', Color='blue', Text='0',$
-              title='FKM clustering: delta_U...',xsize=250,ysize=20)
+;progressbar = Obj_New('progressbar', Color='blue', Text='0',$
+;              title='FKM clustering: delta_U...',xsize=250,ysize=20)
+
+progressbar = Obj_New('cgprogressbar',$
+                    title='FKM clustering: delta_U...',xsize=250,ysize=20, /cancel)
+
 progressbar->start
 dU = 1.0 & iter=0L
 while ((dU gt 0.001) or (iter lt 20)) and (iter lt niter) do begin
@@ -53,7 +57,7 @@ while ((dU gt 0.001) or (iter lt 20)) and (iter lt niter) do begin
       progressbar->Destroy
       return
    endif
-   progressbar->Update,(iter*100)/niter,text=strtrim(dU,2)
+   progressbar->Update,(iter*100)/niter
    Uold = U
    UU = U*U
    ; update means and distances

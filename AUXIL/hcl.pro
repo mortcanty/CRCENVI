@@ -55,8 +55,12 @@ Delta[idx] = 10e10
 ; begin iteration
 cost = 0.0
 c = m
-progressbar = Obj_New('progressbar', Color='blue', Text='0',$
-              title='HCL: classes remaining...',xsize=250,ysize=20)
+;progressbar = Obj_New('progressbar', Color='blue', Text='0',$
+;              title='HCL: classes remaining...',xsize=250,ysize=20)
+
+progressbar = Obj_New('cgprogressbar',$
+                    title='HCL: classes remaining...',xsize=250,ysize=20, /cancel)
+
 progressbar->start
 while c gt KK do begin
    if progressbar->CheckCancel() then begin
@@ -65,7 +69,7 @@ while c gt KK do begin
       progressbar->Destroy
       return
    endif
-   progressbar->Update,(m-c)*100/m,text=strtrim(c,2)
+   progressbar->Update,(m-c)*100/m
    bm = best_merge(Delta)
    j = bm[0]
    i = bm[1]
