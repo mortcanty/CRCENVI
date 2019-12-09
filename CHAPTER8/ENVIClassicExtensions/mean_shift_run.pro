@@ -145,9 +145,7 @@ COMPILE_OPT IDL2
             labeled[indices] = label
             label++
             pct=idx*100/m
-            progressbar->Update,fix(pct),$
-              text='Modes: '+strtrim(label,2)+ $
-                           '  ('+strtrim(pct,2)+'%)'
+            progressbar->Update,fix(pct)
          endelse
 ;       find the next unlabeled pixel
          next = idx + $

@@ -17,7 +17,7 @@ FUNCTION Cluster_fkm, Array, Weights, Double = Double, N_clusters = N_clusters
   WorkRow = REPLICATE(1.0, 1, Dimension[1]) + Zero
   WorkCol = REPLICATE(1.0, 1, N_Clusters) + Zero
   ClusterNumber = LONARR(Dimension[2])
-  progressbar = Obj_New('progressbar', Color='blue', Text='0',$
+  progressbar = Obj_New('cgprogressbar',$
               title='classifying...',xsize=250,ysize=20)
   progressbar->start
   for Sample = 0L, Dimension[2]-1 do begin
@@ -28,7 +28,7 @@ FUNCTION Cluster_fkm, Array, Weights, Double = Double, N_clusters = N_clusters
           return, 0
        endif
        pct=sample*100/(Dimension[2]-1)
-       progressbar->Update,pct,text=strtrim(pct,2)+'%'
+       progressbar->Update,pct
     endif
     Vector = Array[*,Sample] # WorkCol - Weights
     Metric = WorkRow # ABS(Vector)
